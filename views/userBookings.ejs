@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>User Home Page</title>
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	
+</head>
+<body background="reg2.jpg" style ="background-size: 1200px;background-repeat: no-repeat;">
+<ul class="nav nav-tabs" style="font-weight: bold!important;color: black;">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Bookings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/">Logout</a>
+  </li>
+</ul>
+<table class="table table-bordered" style="margin-top: 20px;">
+  <caption>Bookings made by user</caption>
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">Booking Id</th>
+      <th scope="col">Source</th>
+      <th scope="col">Destination</th>
+      <th scope="col">Current Airline</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(var i=0; i<result.length; i++) {%>
+    <tr>
+      <td><%= result[i]._id %></td>
+      <td><%= result[i].From %></td>
+      <td><%= result[i].To %></td>
+      <td><%= result[i].AirlineId %></td>
+      <td><%= result[i].Status %></td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>
+
+<hr>
+<form action="/changeRequest" method="POST" style = "margin-top: 70px;width: 50%;margin-left: 300px;">
+  <p style="color:red;text-align: center;">Request for flight change<p>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputBookingId">BookingId</label>
+      <input type="text" class="form-control" id="inputBookingId" name="inputBookingId" placeholder="Copy-paste from above">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputAirline">Airline</label>
+      <select id="inputAirline" class="form-control" name="inputAirline">
+        <option selected>Select</option>
+        <option>SpiceAir</option>
+        <option>JetAir</option>
+        <option>Kingfisher</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-success" id="userBtn" style="margin-left:230px">Submit Request</button>
+</form>
+
+</body>	
+</html>

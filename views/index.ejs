@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Register Airlines</title>
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	<script src="clientfunc.js"></script>
+</head>
+<body background="reg2.jpg" style ="background-size: 1200px;background-repeat: no-repeat;">
+<ul class="nav nav-tabs" style="font-weight: bold!important;color: black;">
+  <li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/userlogin">User Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/airlinesLogin">Airline Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="/Register">Register Airlines</a>
+  </li>
+</ul>
+<form action="/Register" method="POST" style = "margin-top: 50px;width: 50%;margin-left: 300px;">
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputEmail" style="font-weight: bold;color: black">Email</label>
+      <input type="email" class="form-control" id="inputEmail" name="inputEmail" placeholder="Email Id">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputPassword" style="font-weight: bold;color: black">Password</label>
+      <input type="password" class="form-control" id="inputPassword" name="inputPassword" placeholder="Password">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputAirlineName" style="font-weight: bold;color: black">Airline Name</label>
+      <input type="text" class="form-control" id="inputAirlineName" name="inputAirlineName" placeholder="Airline's Name">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputNumberOfSeats" style="font-weight: bold;color: black">Number of Seats</label>
+      <input type="text" class="form-control" id="inputNumberOfSeats" name="inputNumberOfSeats" placeholder="Total Seats in the Airline">
+    </div>
+  </div>  
+  <div class="form-row">
+    <div class="form-group col-md-6">
+    <label for="inputFlyingFrom" style="font-weight: bold;color: black">Flying From (Source)</label>
+    <input type="text" class="form-control" id="inputFlyingFrom" name="inputFlyingFrom" placeholder="Source Airport">
+  </div>
+  <div class="form-group col-md-6">
+    <label for="inputFlyingTo" style="font-weight: bold;color: black">Flying To (Destination)</label>
+    <input type="text" class="form-control" id="inputFlyingTo" name="inputFlyingTo" placeholder="Destination Airport">
+  </div>
+  </div>
+  <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Register</button>
+  <div class="alert alert-success" id="successMsg" role="alert" style="margin-top:10px;display:none;">
+  User Registered successfully! Please Login.
+  </div>
+</form>
+</body>	
+</html>

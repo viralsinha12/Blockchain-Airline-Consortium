@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Airline Home Page</title>
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	
+</head>
+<body background="reg2.jpg" style ="background-size: 1200px;background-repeat: no-repeat;">
+<ul class="nav nav-tabs" style="font-weight: bold!important;color: black;">
+  <li class="nav-item">
+    <a class="nav-link active" href="/airlinerequests">Customer Requests</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/consortiumRequests">Consortium Requests</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/">Logout</a>
+  </li>
+</ul>
+<table class="table table-bordered" style="margin-top: 20px;">
+  <caption>Requests made by Customer</caption>
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">Booking Id</th>
+      <th scope="col">Current Airline</th>
+      <th scope="col">Requested Airline</th>
+      <th scope="col">Status</th>
+      <th scope="col">Passenger Id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(var i=0; i<result.length; i++) {%>
+    <tr>
+      <td><%= result[i]._id %></td>
+      <td><%= result[i].CurrentAirline %></td>
+      <td><%= result[i].RequestedAirline %></td>
+      <td><%= result[i].status %></td>
+      <td><%= result[i].PassengerId %></td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>
+
+<hr>
+<form action="/TransferRequest" method="POST" style = "margin-top: 70px;width: 50%;margin-left: 300px;">
+  <p style="color:green;text-align: center;">Verify and approve change request<p>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <input type="text" class="form-control" id="inputBookingId" name="inputBookingId" placeholder="Copy-paste from above" style = "margin-left: 90px;width: 140%">
+    </div>
+
+  </div>
+  <button type="submit" class="btn btn-success" id="userBtn" style="margin-left:180px">Verify and Transfer Request</button>
+</form>
+
+</body>	
+</html>

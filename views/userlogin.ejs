@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>User Login</title>
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+	
+</head>
+<body background="reg2.jpg" style ="background-size: 1200px;background-repeat: no-repeat;">
+<ul class="nav nav-tabs" style="font-weight: bold!important">
+  <li class="nav-item">
+    <a class="nav-link" href="/">Home</a>
+  </li>
+  <li class="nav-item" >
+    <a class="nav-link active" href="#">User Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/airlinesLogin">Airline Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/Register">Register Airlines</a>
+  </li>
+</ul>
+<form action="/userlogin" method="POST" style = "margin-top: 70px;width: 50%;margin-left: 300px;">
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputEmail" style="font-weight: bold;color: black">Email</label>
+      <input type="email" class="form-control" id="logininputEmail" name="logininputEmail" placeholder="User Email">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputPassword4" style="font-weight: bold;color: black">Password</label>
+      <input type="password" class="form-control" id="inputPassword" name="logininputPassword" placeholder="User's Password">
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Login</button>
+</form>
+</body>	
+</html>
