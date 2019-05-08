@@ -34,7 +34,11 @@
       <td><%= result[i]._id %></td>
       <td><%= result[i].CurrentAirline %></td>
       <td><%= result[i].RequestedAirline %></td>
-      <td><%= result[i].status %></td>
+                  <% if (result[i].Status == "Confirmed") { %>
+        <td style="color:green"><%= result[i].Status %></td>
+      <% } else { %>
+        <td style="color:red"><%= result[i].Status %></td>
+      <% } %>
       <td><%= result[i].PassengerId %></td>
     </tr>
   <% } %>
