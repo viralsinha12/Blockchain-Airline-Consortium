@@ -11,6 +11,7 @@ const session =  require('express-session') ;
 const app = express();
 var contract = require("truffle-contract");
 var renderresult =false;
+let add;
 app.use(bodyParser());
 app.use(express.static('public'));
 app.set('view engine','ejs');
@@ -48,7 +49,7 @@ const output = solc.compile(input.toString(), 1);
 const bytecode = output.contracts[':Migrations']['bytecode'];
 const abi = JSON.parse(output.contracts[':Migrations'].interface);
 
-var add;
+
 var contract = new web3.eth.Contract(abi);
 contract.deploy({
     data: '0x'+bytecode,
@@ -60,8 +61,10 @@ contract.deploy({
 })
 .on('receipt', (receipt) => {
    add=receipt.contractAddress;
-
+   console.log(add)
 })
+
+console.log(add);
 
 app.get('/', (req, res) => {
   AirlineDb.collection('Users').find().toArray(function(err, results){
@@ -162,7 +165,7 @@ app.post('/TransferRequest',(req, res)=>{
 
       //for checking modifiers//
       // fromAddress='0x8bc45A7cC1Be921515d390Fc5cC9C19daf33faCf';  
-      contract.methods.registerRequest(fromAddress,toAddress,requestNumber).send({from:fromAddress}).on('transactionHash', (hashResult) => {
+      contract.methods.registerRequest(fromAddress,toAddress,requestNumber).send({from:fromAddress,value : web3.utils.toWei('1.5', 'ether')}).on('transactionHash', (hashResult) => {
         requestNumber = requestNumber+1;
       var newTransferRequest = {
       BookingId : req.body.inputBookingId,
@@ -360,7 +363,7 @@ app.post('/UserRegistration',(req, res)=>{
       if(result == "")
       {
           i++;
-          contract.methods.registerUser(useraddr).send({from:useraddr}).on('transactionHash', (hashResult) => {
+          contract.methods.registerUser(useraddr).send({from:useraddr,value : web3.utils.toWei('0.5', 'ether')}).on('transactionHash', (hashResult) => {
           var newUser = {
             Name: req.body.inputEmail,
             Password : req.body.inputPassword,
@@ -403,7 +406,7 @@ app.post('/Register',(req, res)=>{
       if(result == "")
       {
         i++;
-          contract.methods.registerAirline(airlineAddress).send({from:airlineAddress}).on('transactionHash', (hashResult) => {
+          contract.methods.registerAirline(airlineAddress).send({from:airlineAddress,value : web3.utils.toWei('2', 'ether')}).on('transactionHash', (hashResult) => {
           var newAirline = {
             AirlineId: req.body.inputEmail,
             password: hash,
@@ -467,7 +470,7 @@ if(result[0].SeatsRemaining > 1)
   query = {_id:ObjectId(result[0].BookingId)};
   newvalues = { $set: { Status: "Confirmed",CurrentAirline:airlineName } };  
   AirlineDb.collection("BookingFromUsers").updateOne(query,newvalues,function(err, result) {
-  contract.methods.registerResponse(fromAddress,toAddress,responseNumber).send({from:fromAddress}).on('transactionHash', (hashResult) => {
+  contract.methods.registerResponse(fromAddress,toAddress,responseNumber).send({from:fromAddress,value : web3.utils.toWei('1.5', 'ether')}).on('transactionHash', (hashResult) => {
   responseNumber = responseNumber+1;
   var newResponse = {
     RequestId : requestId,

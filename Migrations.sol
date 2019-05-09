@@ -43,7 +43,7 @@ contract Migrations {
     _;
   }
 
-  function registerUser(address userAddress) public {
+  function registerUser(address userAddress) payable public {
       users[userAddress] = true;
   }
 
@@ -55,11 +55,11 @@ contract Migrations {
       airlines[airlineAddress] = false;
   }
 
-  function registerAirline(address airlineAddress) public {
+  function registerAirline(address airlineAddress) payable public {
       airlines[airlineAddress] = true;
   }
 
-  function registerRequest(address requestedBy,address requestedTo,uint requestNumber) onlyRegisteredAirlines public{
+  function registerRequest(address requestedBy,address requestedTo,uint requestNumber) onlyRegisteredAirlines payable public{
     requestLog memory req = requestLogs[requests];
     req.requestedBy = requestedBy;
     req.requestedTo = requestedTo;
@@ -67,7 +67,7 @@ contract Migrations {
     requests = requests+1;
   }  
 
-  function registerResponse(address responseBy,address responseTo,uint responseNumber) onlyRegisteredAirlines public{
+  function registerResponse(address responseBy,address responseTo,uint responseNumber) onlyRegisteredAirlines payable public{
     responseLog memory res = responseLogs[responses];
     res.responseBy = responseBy;
     res.responseTo = responseTo;
