@@ -29,7 +29,12 @@ app.listen(3000,function (){
 })
 })
 web3.eth.getAccounts().then(
+
 function(addressObj){
+var requestNumber  = Math.floor(Math.random() * 10000);
+var responseNumber  = Math.floor(Math.random() * 100000)+10000;
+var showMsg="";
+var messageFromAPI="";
 var airlinesDropDown;
 var i=0
 var chairPerson = addressObj[i];
@@ -66,20 +71,26 @@ app.get('/', (req, res) => {
 })
 
 app.get('/UnRegister', (req, res) => {
-      res.render('UnRegister.ejs')
+      res.render('UnRegister.ejs',{showMsg:showMsg,messageFromAPI:messageFromAPI})
+      messageFromAPI="";
+      showMsg="";
 })
 
 app.get('/userlogin', (req, res) => {
   AirlineDb.collection('Users').find().toArray(function(err, results){
     if(err) return console.log(err)
-      res.render('userlogin.ejs')
+      res.render('userlogin.ejs',{showMsg:showMsg,messageFromAPI:messageFromAPI})
+      showMsg="";
+      messageFromAPI="";
   })
 })
 
 app.get('/userRegistration', (req, res) => {
   query = {Status :"1"};
   AirlineDb.collection('Airlines').find(query).toArray(function(err, results){
-      res.render('userRegistration.ejs',{drpdown:results})
+      res.render('userRegistration.ejs',{drpdown:results,showMsg:showMsg,messageFromAPI:messageFromAPI})
+      messageFromAPI="";
+      showMsg="";
   })
 })
 
@@ -92,7 +103,9 @@ app.get('/airlinerequests', (req, res) => {
     AirlineDb.collection('ChangeRequests').find(query).toArray(function(err, results){
     query = {RequestedToAirline : airlineName,Status:{$in : ["Pending"]}};  
     AirlineDb.collection('ConsortiumRequests').find(query).toArray(function(err, cresults){
-    res.render('airlinePage.ejs',{result:results,numberOfPendingRequests:cresults.length});
+    res.render('airlinePage.ejs',{result:results,numberOfPendingRequests:cresults.length,showMsg:showMsg,messageFromAPI:messageFromAPI});
+    showMsg="";
+    messageFromAPI="";
     })
     })
   })
@@ -101,31 +114,42 @@ app.get('/airlinerequests', (req, res) => {
 app.get('/userBookings', (req, res) => {
   var query = { UserName:loggedInUser};
   AirlineDb.collection('BookingFromUsers').find(query).toArray(function(err, results){
-      res.render('userBookings.ejs',{result:results,airlinesDropDownejs:airlinesDropDown});
+      res.render('userBookings.ejs',{result:results,airlinesDropDownejs:airlinesDropDown,showMsg:showMsg,messageFromAPI:messageFromAPI});
+      showMsg="";
+      messageFromAPI="";
   })
 })
 
 app.get('/consortiumRequests', (req, res) => {
   var query = { RequestedToAirline:airlineName,Status:"Pending"};
   AirlineDb.collection('ConsortiumRequests').find(query).toArray(function(err, results){
-      res.render('consortiumRequests.ejs',{result:results,numberOfPendingRequests:results.length});
+      res.render('consortiumRequests.ejs',{result:results,numberOfPendingRequests:results.length,showMsg:showMsg,messageFromAPI:messageFromAPI});
+      showMsg="";
+      messageFromAPI="";
   })
 })
 
 app.get('/airlinesLogin', (req, res) => {
-  		res.render('airlinesLogin.ejs')
+  		res.render('airlinesLogin.ejs',{showMsg:showMsg,messageFromAPI:messageFromAPI});
+      showMsg="";
+      messageFromAPI="";
 })
 
 app.get('/Register', (req, res) => {
-  res.render('index.ejs');
+  res.render('index.ejs',{showMsg:showMsg,messageFromAPI:messageFromAPI});
+  showMsg="";
+  messageFromAPI="";
 })
 
 app.get('/UnRegisterUser', (req, res) => {
-  res.render('UnRegisterUser.ejs');
+  res.render('UnRegisterUser.ejs',{showMsg:showMsg,messageFromAPI:messageFromAPI});
+  showMsg="";
+  messageFromAPI="";
 })
 
 
 app.post('/TransferRequest',(req, res)=>{
+  try{
     query = {_id:ObjectId(req.body.inputBookingId)};
       AirlineDb.collection('ChangeRequests').find(query).toArray(function(err, changeRequestResults){
       var fromAddress = changeRequestResults[0].CurrentAirline;
@@ -138,7 +162,8 @@ app.post('/TransferRequest',(req, res)=>{
 
       //for checking modifiers//
       // fromAddress='0x8bc45A7cC1Be921515d390Fc5cC9C19daf33faCf';  
-      contract.methods.registerRequest(fromAddress,toAddress,req.body.inputBookingId).send({from:fromAddress}).on('transactionHash', (hashResult) => {
+      contract.methods.registerRequest(fromAddress,toAddress,requestNumber).send({from:fromAddress}).on('transactionHash', (hashResult) => {
+        requestNumber = requestNumber+1;
       var newTransferRequest = {
       BookingId : req.body.inputBookingId,
       RequestedByAirline : airlineName,
@@ -146,21 +171,31 @@ app.post('/TransferRequest',(req, res)=>{
       Createdtime:datetime, 
       Status : "Pending",
       TransactionId :hashResult,
-      ResponseId :""
+      ResponseId :"",
+      RequestNumber:requestNumber
     };
       AirlineDb.collection('ConsortiumRequests').save(newTransferRequest,(err, result) =>{ 
               query = {_id:ObjectId(req.body.inputBookingId)};      
               var newvalues = { $set: { Status: "Requested" }};
               AirlineDb.collection("ChangeRequests").updateOne(query,newvalues,function(err, resu) {
-              return res.redirect('/airlinerequests');
+              res.redirect('/airlinerequests');
       })
       })
       }).on('error',(err)=>{
         // show message
-          return res.redirect('/airlinerequests');
+        showMsg="True";
+        messageFromAPI="Invalid BookingId or Airline not registered on consortium";
+          res.redirect('/airlinerequests');
       })
    })
     })
+}
+catch(ex)
+{
+       showMsg="True";
+        messageFromAPI="Invalid BookingId or Airline not registered on consortium";
+          res.redirect('/airlinerequests');
+}
 })
 
 app.post('/airlinesLogin',(req, res)=>{
@@ -169,16 +204,24 @@ app.post('/airlinesLogin',(req, res)=>{
    var inputpassword = req.body.logininputPassword;
    var query = { AirlineId:req.body.logininputEmail};
    AirlineDb.collection("Airlines").find(query).toArray(function(err, resu) {
+    if(resu != ""){
       airlineName = resu[0].AirlineName;
       var query = { RequestedToAirline:airlineName,Status:"Pending"};
       AirlineDb.collection('ConsortiumRequests').find(query).toArray(function(err, results){
       len = results.length;  
       query = {CurrentAirline : airlineName,Status:"Pending"};
       AirlineDb.collection('ChangeRequests').find(query).toArray(function(err, results){
-      res.render('airlinePage.ejs',{result:results,numberOfPendingRequests:len});
+      res.render('airlinePage.ejs',{result:results,numberOfPendingRequests:len,showMsg:showMsg,messageFromAPI:messageFromAPI});
       })
     })  
-  })
+  }
+  else
+  {
+    showMsg="True";
+    messageFromAPI="Airline does not exist";
+    res.redirect('/airlinesLogin')
+  }
+ })
 })
 
 app.post('/userlogin',(req, res)=>{
@@ -191,7 +234,7 @@ app.post('/userlogin',(req, res)=>{
    var inputpassword = req.body.logininputPassword;
    var query = { Name:req.body.logininputEmail};
    AirlineDb.collection("Users").find(query).toArray(function(err, resu) {
-   if(resu[0].Password == inputpassword) {
+   if(resu != "") {
     var query = { UserName:req.body.logininputEmail};
     AirlineDb.collection("BookingFromUsers").find(query).toArray(function(err, resu) {
      try 
@@ -199,13 +242,22 @@ app.post('/userlogin',(req, res)=>{
 
         loggedInUser = req.body.logininputEmail;
 
-        res.render('userBookings.ejs',{result:resu,airlinesDropDownejs:airlinesDropDown});
+        res.render('userBookings.ejs',{result:resu,airlinesDropDownejs:airlinesDropDown,showMsg:showMsg,messageFromAPI:messageFromAPI});
      }
      catch(ex)
      {
+        showMsg="True";
+        messageFromAPI = "User does not exists";
+        res.redirect('/userlogin');
      }
     })
 
+  }
+  else
+  {
+      showMsg="True";
+        messageFromAPI = "User does not exists";
+        res.redirect('/userlogin');
   }
 });
 })
@@ -213,8 +265,9 @@ app.post('/userlogin',(req, res)=>{
 
 
 app.post('/changeRequest',(req, res)=>{
+   try{ 
    var query = { _id:ObjectId(req.body.inputBookingId)};
-   var newvalues = { $set: { Status: "Change Requested" } };
+      var newvalues = { $set: { Status: "Change Requested" } };
    AirlineDb.collection("BookingFromUsers").find(query).toArray(function(err, resu) {
    if(resu[0]._id == req.body.inputBookingId) {
     var obj = resu;
@@ -235,35 +288,68 @@ app.post('/changeRequest',(req, res)=>{
       res.redirect('/userBookings');
 })
 }
+else
+{
+  showMsg="True";
+  messageFromAPI="Invalid Booking Id entered";
+  res.redirect('/userBookings');
+}
 })
+ }
+ catch(ex)
+ {
+  showMsg="True";
+  messageFromAPI="Invalid Booking Id entered";
+  res.redirect('/userBookings');
+}
 })
 
 app.post('/UnRegisterUser',(req,res)=>{
   var userAddress;
   query = {Name:req.body.logininputEmail}
   AirlineDb.collection("Users").find(query).toArray(function(err, result) {
+    if(result!=""){
     userAddress = result[0].userAddress;
     newvalues = {$set : {Status : "0"}};
     AirlineDb.collection("Users").updateOne(query,newvalues,function(err, result) {
     contract.methods.UnregisterUser(userAddress).send({from:userAddress}).on('transactionHash', (hashResult) => {
+      showMsg="True";
+      messageFromAPI="User de-registered from consortium";
       res.redirect('/UnRegisterUser');
     })    
   })
-  })
+  }
+  else
+  {
+      showMsg="True";
+      messageFromAPI="User not registered with consortium";
+      res.redirect('/UnRegisterUser');
+  }
+})
 })
 
 app.post('/UnRegisterAirline',(req,res)=>{
   var addressToUnRegister;
   query = {AirlineId:req.body.logininputEmail}
   AirlineDb.collection("Airlines").find(query).toArray(function(err, result) {
+    if(result!=""){
     addressToUnRegister = result[0].airlineAddress;
     newvalues = {$set : {Status : "0"}};
     AirlineDb.collection("Airlines").updateOne(query,newvalues,function(err, result) {
     contract.methods.unregisterAirline(addressToUnRegister).send({from:addressToUnRegister}).on('transactionHash', (hashResult) => {
+      showMsg="True"
+      messageFromAPI="Airline de-registered from consortium";
       res.redirect('/UnRegister');
     })    
   })
-  })
+  }
+  else
+  {
+      showMsg="True"
+      messageFromAPI="Airline not registered with the consortium";
+      res.redirect('/UnRegister');
+  }
+})
 })
 
 app.post('/UserRegistration',(req, res)=>{
@@ -292,6 +378,8 @@ app.post('/UserRegistration',(req, res)=>{
             UserName:req.body.inputEmail
           };
           AirlineDb.collection('BookingFromUsers').save(newBookingFromUser,(result) =>{
+            showMsg="True";
+            messageFromAPI="User successfully registered";
              res.redirect('/UserRegistration');
           });  
         });
@@ -299,7 +387,9 @@ app.post('/UserRegistration',(req, res)=>{
       }
       else
       {
-        res.redirect('/Register');
+        showMsg="True";
+        messageFromAPI="User already exists or is de-registered from the consortium";
+        res.redirect('/UserRegistration');
         //show validation message
       }  
 })
@@ -332,6 +422,8 @@ app.post('/Register',(req, res)=>{
             SeatsRemaining:req.body.inputNumberOfSeats,
           };
           AirlineDb.collection('AirlineSeatsCount').save(newAirlineSeatObj,(result) =>{
+            showMsg="True";
+            messageFromAPI ="Airline successfully Registered";
              res.redirect('/Register');
           });  
         });
@@ -339,6 +431,8 @@ app.post('/Register',(req, res)=>{
       }
       else
       {
+        showMsg="True";
+        messageFromAPI="Airline already exists or it exists but is de-registered from the consortium";
         res.redirect('/Register');
         //show validation message
       }  
@@ -373,13 +467,14 @@ if(result[0].SeatsRemaining > 1)
   query = {_id:ObjectId(result[0].BookingId)};
   newvalues = { $set: { Status: "Confirmed",CurrentAirline:airlineName } };  
   AirlineDb.collection("BookingFromUsers").updateOne(query,newvalues,function(err, result) {
-  contract.methods.registerResponse(fromAddress,toAddress,bookingId,"Confirmed").send({from:fromAddress}).on('transactionHash', (hashResult) => {
-
+  contract.methods.registerResponse(fromAddress,toAddress,responseNumber).send({from:fromAddress}).on('transactionHash', (hashResult) => {
+  responseNumber = responseNumber+1;
   var newResponse = {
     RequestId : requestId,
     TransactionId : hashResult,
     Createdtime : datetime,
-    Response : "Confirmed"
+    Response : "Confirmed",
+    ResponseNumber : responseNumber
   }
 
   AirlineDb.collection('ConsortiumResponses').save(newResponse,(err, result) =>{
@@ -394,7 +489,7 @@ if(result[0].SeatsRemaining > 1)
       AirlineDb.collection("AirlineSeatsCount").updateOne(queryseat,newvaluesSeat,function(err, result) {
       web3.eth.sendTransaction({from: fromAddress,to : toAddress,value : web3.utils.toWei('1', 'ether')}, function(error, hash){
       });
-      res.redirect('/airlinerequests');
+      res.redirect('/consortiumRequests');
 })
 })
 })
@@ -408,7 +503,9 @@ if(result[0].SeatsRemaining > 1)
 }
 else
 {
-  //reject and change the status
+  showMsg="True";
+  messageFromAPI="Invalid BookingId or Airline not registered on consortium";
+  res.redirect('/airlinerequests');
 }
 })
 })

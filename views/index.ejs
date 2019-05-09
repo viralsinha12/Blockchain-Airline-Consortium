@@ -64,6 +64,13 @@
         * Airline will be registered on the consortium.
       </label>
   <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Register</button>
+
+<% if (showMsg == "True"){ %>
+<div class="alert alert-warning" role="alert" style="margin-top: 10px">
+      <%= messageFromAPI %>
+</div>
+<% } %>
+
 </form>
 </body>	
 </html>

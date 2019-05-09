@@ -48,7 +48,7 @@
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="inputBookingId">BookingId</label>
-      <input type="text" class="form-control" id="inputBookingId" name="inputBookingId" placeholder="Copy-paste from above">
+      <input type="text" class="form-control" id="inputBookingId" name="inputBookingId" placeholder="Copy-paste from above" required>
     </div>
     <div class="form-group col-md-6">
       <label for="inputAirline">Airline</label>
@@ -61,6 +61,11 @@
     </div>
   </div>
   <button type="submit" class="btn btn-success" id="userBtn" style="margin-left:230px">Submit Request</button>
+      <% if (showMsg == "True"){ %>
+<div class="alert alert-warning" role="alert" style="margin-top: 10px">
+      <%= messageFromAPI %>
+</div>
+<% } %>
 </form>
 
 </body>	

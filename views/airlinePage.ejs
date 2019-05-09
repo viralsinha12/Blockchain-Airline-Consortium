@@ -51,11 +51,16 @@
   <p style="color:green;text-align: center;">Verify and approve change request<p>
   <div class="form-row">
     <div class="form-group col-md-6">
-      <input type="text" class="form-control" id="inputBookingId" name="inputBookingId" placeholder="Copy-paste from above" style = "margin-left: 90px;width: 140%">
+      <input type="text" class="form-control" id="inputBookingId" name="inputBookingId" placeholder="Copy-paste from above" style = "margin-left: 90px;width: 140%" required>
     </div>
 
   </div>
   <button type="submit" class="btn btn-success" id="userBtn" style="margin-left:180px">Verify and Transfer Request</button>
+      <% if (showMsg == "True"){ %>
+<div class="alert alert-warning" role="alert" style="margin-top: 10px">
+      <%= messageFromAPI %>
+</div>
+<% } %>
 </form>
 
 </body>	

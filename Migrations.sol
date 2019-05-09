@@ -12,14 +12,13 @@ contract Migrations {
   struct requestLog{
     address requestedBy;
     address requestedTo;
-    string bookingId;
+    uint requestNumber;
   }
 
   struct responseLog{
     address responseBy;
     address responseTo;
-    string bookingId;
-    string requestStatus;
+    uint responseNumber;
   }
 
   struct payment{
@@ -60,28 +59,19 @@ contract Migrations {
       airlines[airlineAddress] = true;
   }
 
-  function registerRequest(address requestedBy,address requestedTo,string memory bookingId) onlyRegisteredAirlines public{
+  function registerRequest(address requestedBy,address requestedTo,uint requestNumber) onlyRegisteredAirlines public{
     requestLog memory req = requestLogs[requests];
     req.requestedBy = requestedBy;
     req.requestedTo = requestedTo;
-    req.bookingId = bookingId;
+    req.requestNumber = requestNumber;
     requests = requests+1;
   }  
 
-  function registerResponse(address responseBy,address responseTo,string memory bookingId,string memory requestStatus) onlyRegisteredAirlines public{
+  function registerResponse(address responseBy,address responseTo,uint responseNumber) onlyRegisteredAirlines public{
     responseLog memory res = responseLogs[responses];
     res.responseBy = responseBy;
     res.responseTo = responseTo;
-    res.bookingId = bookingId;
-    res.requestStatus = requestStatus;
+    res.responseNumber = responseNumber;
     responses = responses+1;
-  }
-
-  function settlePayment(address sender,address receiver) public payable{
-    receiver.transfer(msg.value);
-    payment memory pay = paymentLogs[payments];
-    pay.sender = sender;
-    pay.receiver = receiver;
-    pay.value = 1;
   }
 }
