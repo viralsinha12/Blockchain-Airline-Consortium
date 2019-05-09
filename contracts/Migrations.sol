@@ -41,6 +41,10 @@ contract Migrations {
       airlines[airlineAddress] = true;
   }
 
+  function unregisterAirline(address airlineAddress) public {
+      airlines[airlineAddress] = false;
+  }
+
   function registerRequest(address requestedBy,address requestedTo,string memory bookingId) public{
     requestLog memory req = requestLogs[requests];
     req.requestedBy = requestedBy;

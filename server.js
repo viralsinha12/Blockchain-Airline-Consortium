@@ -23,6 +23,8 @@ AirlineDb.collection('AirlineSeatsCount').deleteMany({})
 AirlineDb.collection('ChangeRequests').deleteMany({})
 AirlineDb.collection('ConsortiumRequests').deleteMany({})
 AirlineDb.collection('ConsortiumResponses').deleteMany({})
+AirlineDb.collection('Users').deleteMany({})
+AirlineDb.collection('BookingFromUsers').deleteMany({})
 app.listen(3000,function (){
 })
 })
@@ -30,7 +32,7 @@ web3.eth.getAccounts().then(
 function(addressObj){
 var airlinesDropDown;
 var i=0
-var chairPerson = addressObj[0];
+var chairPerson = addressObj[i];
 i++;
 var returnHash;
 var airlineName;
@@ -63,10 +65,21 @@ app.get('/', (req, res) => {
   })
 })
 
+app.get('/UnRegister', (req, res) => {
+      res.render('UnRegister.ejs')
+})
+
 app.get('/userlogin', (req, res) => {
   AirlineDb.collection('Users').find().toArray(function(err, results){
     if(err) return console.log(err)
       res.render('userlogin.ejs')
+  })
+})
+
+app.get('/userRegistration', (req, res) => {
+  query = {Status :"1"};
+  AirlineDb.collection('Airlines').find(query).toArray(function(err, results){
+      res.render('userRegistration.ejs',{drpdown:results})
   })
 })
 
@@ -75,9 +88,12 @@ app.get('/airlinerequests', (req, res) => {
    AirlineDb.collection("Airlines").find(query).toArray(function(err, resu) {
       airlineName = resu[0].AirlineName;
 
-    query = {CurrentAirline : airlineName,Status:"Pending"};
+    query = {CurrentAirline : airlineName,Status:{$in : ["Pending","Requested"]}};
     AirlineDb.collection('ChangeRequests').find(query).toArray(function(err, results){
-      res.render('airlinePage.ejs',{result:results});
+    query = {RequestedToAirline : airlineName,Status:{$in : ["Pending"]}};  
+    AirlineDb.collection('ConsortiumRequests').find(query).toArray(function(err, cresults){
+    res.render('airlinePage.ejs',{result:results,numberOfPendingRequests:cresults.length});
+    })
     })
   })
 })
@@ -92,7 +108,7 @@ app.get('/userBookings', (req, res) => {
 app.get('/consortiumRequests', (req, res) => {
   var query = { RequestedToAirline:airlineName,Status:"Pending"};
   AirlineDb.collection('ConsortiumRequests').find(query).toArray(function(err, results){
-      res.render('consortiumRequests.ejs',{result:results});
+      res.render('consortiumRequests.ejs',{result:results,numberOfPendingRequests:results.length});
   })
 })
 
@@ -102,6 +118,10 @@ app.get('/airlinesLogin', (req, res) => {
 
 app.get('/Register', (req, res) => {
   res.render('index.ejs');
+})
+
+app.get('/UnRegisterUser', (req, res) => {
+  res.render('UnRegisterUser.ejs');
 })
 
 
@@ -114,7 +134,10 @@ app.post('/TransferRequest',(req, res)=>{
       query = {AirlineName :{$in:[fromAddress,toAddress]}}
       AirlineDb.collection('Airlines').find(query).toArray(function(err, airlinesResults){
       fromAddress = airlinesResults[0].airlineAddress;
-      toAddress = airlinesResults[1].airlineAddress;  
+      toAddress = airlinesResults[1].airlineAddress;
+
+      //for checking modifiers//
+      // fromAddress='0x8bc45A7cC1Be921515d390Fc5cC9C19daf33faCf';  
       contract.methods.registerRequest(fromAddress,toAddress,req.body.inputBookingId).send({from:fromAddress}).on('transactionHash', (hashResult) => {
       var newTransferRequest = {
       BookingId : req.body.inputBookingId,
@@ -126,24 +149,35 @@ app.post('/TransferRequest',(req, res)=>{
       ResponseId :""
     };
       AirlineDb.collection('ConsortiumRequests').save(newTransferRequest,(err, result) =>{ 
+              query = {_id:ObjectId(req.body.inputBookingId)};      
+              var newvalues = { $set: { Status: "Requested" }};
+              AirlineDb.collection("ChangeRequests").updateOne(query,newvalues,function(err, resu) {
               return res.redirect('/airlinerequests');
       })
+      })
+      }).on('error',(err)=>{
+        // show message
+          return res.redirect('/airlinerequests');
       })
    })
     })
 })
 
 app.post('/airlinesLogin',(req, res)=>{
+  var len;
    var val;
    var inputpassword = req.body.logininputPassword;
    var query = { AirlineId:req.body.logininputEmail};
    AirlineDb.collection("Airlines").find(query).toArray(function(err, resu) {
       airlineName = resu[0].AirlineName;
-
-    query = {CurrentAirline : airlineName,Status:"Pending"};
-    AirlineDb.collection('ChangeRequests').find(query).toArray(function(err, results){
-      res.render('airlinePage.ejs',{result:results});
-    })
+      var query = { RequestedToAirline:airlineName,Status:"Pending"};
+      AirlineDb.collection('ConsortiumRequests').find(query).toArray(function(err, results){
+      len = results.length;  
+      query = {CurrentAirline : airlineName,Status:"Pending"};
+      AirlineDb.collection('ChangeRequests').find(query).toArray(function(err, results){
+      res.render('airlinePage.ejs',{result:results,numberOfPendingRequests:len});
+      })
+    })  
   })
 })
 
@@ -204,6 +238,73 @@ app.post('/changeRequest',(req, res)=>{
 })
 })
 
+app.post('/UnRegisterUser',(req,res)=>{
+  var userAddress;
+  query = {Name:req.body.logininputEmail}
+  AirlineDb.collection("Users").find(query).toArray(function(err, result) {
+    userAddress = result[0].userAddress;
+    newvalues = {$set : {Status : "0"}};
+    AirlineDb.collection("Users").updateOne(query,newvalues,function(err, result) {
+    contract.methods.UnregisterUser(userAddress).send({from:userAddress}).on('transactionHash', (hashResult) => {
+      res.redirect('/UnRegisterUser');
+    })    
+  })
+  })
+})
+
+app.post('/UnRegisterAirline',(req,res)=>{
+  var addressToUnRegister;
+  query = {AirlineId:req.body.logininputEmail}
+  AirlineDb.collection("Airlines").find(query).toArray(function(err, result) {
+    addressToUnRegister = result[0].airlineAddress;
+    newvalues = {$set : {Status : "0"}};
+    AirlineDb.collection("Airlines").updateOne(query,newvalues,function(err, result) {
+    contract.methods.unregisterAirline(addressToUnRegister).send({from:addressToUnRegister}).on('transactionHash', (hashResult) => {
+      res.redirect('/UnRegister');
+    })    
+  })
+  })
+})
+
+app.post('/UserRegistration',(req, res)=>{
+
+      query = {Name:req.body.inputEmail};
+      var useraddr = addressObj[i];
+      AirlineDb.collection("Users").find(query).toArray(function(err, result) {
+      if(result == "")
+      {
+          i++;
+          contract.methods.registerUser(useraddr).send({from:useraddr}).on('transactionHash', (hashResult) => {
+          var newUser = {
+            Name: req.body.inputEmail,
+            Password : req.body.inputPassword,
+            createdtime:datetime,
+            TransactionId:hashResult,
+            userAddress:useraddr,
+            Status : "1"
+          };  
+          AirlineDb.collection('Users').save(newUser,(result) =>{
+          var newBookingFromUser = {
+            Source:req.body.inputFlyingFrom,
+            Destination:req.body.inputFlyingTo,
+            CurrentAirline:req.body.inputAirline,
+            Status:"Confirmed",
+            UserName:req.body.inputEmail
+          };
+          AirlineDb.collection('BookingFromUsers').save(newBookingFromUser,(result) =>{
+             res.redirect('/UserRegistration');
+          });  
+        });
+        })  
+      }
+      else
+      {
+        res.redirect('/Register');
+        //show validation message
+      }  
+})
+})
+
 app.post('/Register',(req, res)=>{
       var hash = bcrypt.hashSync(req.body.inputPassword,10);
       airlineAddress = addressObj[i];
@@ -222,7 +323,8 @@ app.post('/Register',(req, res)=>{
             Destination:req.body.inputFlyingTo,
             createdtime:datetime,
             TransactionId:hashResult,
-            airlineAddress:airlineAddress
+            airlineAddress:airlineAddress,
+            Status : "1"
           };  
           AirlineDb.collection('Airlines').save(newAirline,(result) =>{
           var newAirlineSeatObj = {

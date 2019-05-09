@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Register Airlines</title>
+	<title>User Registration</title>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 	<script src="clientfunc.js"></script>
 </head>
@@ -14,13 +14,13 @@
     <a class="nav-link" href="/userlogin">User Login</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="/userRegistration">User Registration</a>
+    <a class="nav-link active" href="#">User Registration</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/airlinesLogin">Airline Login</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link active" href="/Register">Register Airlines</a>
+    <a class="nav-link" href="/Register">Register Airlines</a>
   </li>
     <li class="nav-item">
     <a class="nav-link" href="/UnRegister">Un-Register Airlines</a>
@@ -29,7 +29,7 @@
     <a class="nav-link" href="/UnRegisterUser">Un-Register User</a>
   </li>
 </ul>
-<form action="/Register" method="POST" style = "margin-top: 50px;width: 50%;margin-left: 300px;">
+<form action="/UserRegistration" method="POST" style = "margin-top: 50px;width: 50%;margin-left: 300px;">
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="inputEmail" style="font-weight: bold;color: black">Email</label>
@@ -42,28 +42,29 @@
   </div>
   <div class="form-row">
     <div class="form-group col-md-6">
-      <label for="inputAirlineName" style="font-weight: bold;color: black">Airline Name</label>
-      <input type="text" class="form-control" id="inputAirlineName" name="inputAirlineName" placeholder="Airline's Name" required>
+      <label for="inputAirlineName" style="font-weight: bold;color: black">Airline</label>
+      <select id="inputAirline" class="form-control" name="inputAirline">
+        <option selected>Select</option>       
+    <% for(var i=0; i<drpdown.length; i++) {%>
+      <option><%= drpdown[i].AirlineName %></option>
+    <% } %>
+      </select>
     </div>
-    <div class="form-group col-md-6">
-      <label for="inputNumberOfSeats" style="font-weight: bold;color: black">Number of Seats</label>
-      <input type="text" class="form-control" id="inputNumberOfSeats" name="inputNumberOfSeats" placeholder="Total Seats in the Airline" required>
-    </div>
-  </div>  
-  <div class="form-row">
     <div class="form-group col-md-6">
     <label for="inputFlyingFrom" style="font-weight: bold;color: black">Flying From (Source)</label>
     <input type="text" class="form-control" id="inputFlyingFrom" name="inputFlyingFrom" placeholder="Source Airport" required>
   </div>
+  </div>  
+  <div class="form-row">
   <div class="form-group col-md-6">
     <label for="inputFlyingTo" style="font-weight: bold;color: black">Flying To (Destination)</label>
     <input type="text" class="form-control" id="inputFlyingTo" name="inputFlyingTo" placeholder="Destination Airport" required>
   </div>
   </div>
       <label class="form-check-label" for="invalidCheck2" style="color: green;margin-top: 10px;margin-bottom: 10px">
-        * Airline will be registered on the consortium.
+        * User will be registered on the consortium.
       </label>
-  <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Register</button>
+  <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Register User</button>
 </form>
 </body>	
 </html>

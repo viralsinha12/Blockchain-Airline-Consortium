@@ -13,22 +13,31 @@
   <li class="nav-item">
     <a class="nav-link" href="/userlogin">User Login</a>
   </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/userRegistration">User Registration</a>
+  </li>
   <li class="nav-item">
-    <a class="nav-link active" href="#">Airlines Login</a>
+    <a class="nav-link active" href="#">Airline Login</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/Register">Register Airlines</a>
+  </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/UnRegister">Un-Register Airlines</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/UnRegisterUser">Un-Register User</a>
   </li>
 </ul>
 <form action="/airlinesLogin" method="POST" style = "margin-top: 70px;width: 50%;margin-left: 300px;">
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="inputEmail" style="font-weight: bold;color: black">Email</label>
-      <input type="email" class="form-control" id="logininputEmail" name="logininputEmail" placeholder="Airline Email">
+      <input type="email" class="form-control" id="logininputEmail" name="logininputEmail" placeholder="Airline Email" required>
     </div>
     <div class="form-group col-md-6">
       <label for="inputPassword4" style="font-weight: bold;color: black">Password</label>
-      <input type="password" class="form-control" id="inputPassword" name="logininputPassword" placeholder="Airline Password">
+      <input type="password" class="form-control" id="inputPassword" name="logininputPassword" placeholder="Airline Password" required>
     </div>
   </div>
   <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Login</button>

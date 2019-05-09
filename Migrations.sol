@@ -32,16 +32,35 @@ contract Migrations {
   uint responses = 0;
   uint payments = 0;
 
+  mapping(address=>bool) users;
   mapping(address=>bool) airlines;
   mapping(uint=>requestLog) requestLogs;
   mapping(uint=>responseLog) responseLogs;
   mapping(uint=>payment) paymentLogs;
 
+  modifier onlyRegisteredAirlines
+  {
+    require(airlines[msg.sender]==true);
+    _;
+  }
+
+  function registerUser(address userAddress) public {
+      users[userAddress] = true;
+  }
+
+  function UnregisterUser(address userAddress) public {
+      users[userAddress] = false;
+  }
+
+  function unregisterAirline(address airlineAddress) public {
+      airlines[airlineAddress] = false;
+  }
+
   function registerAirline(address airlineAddress) public {
       airlines[airlineAddress] = true;
   }
 
-  function registerRequest(address requestedBy,address requestedTo,string memory bookingId) public{
+  function registerRequest(address requestedBy,address requestedTo,string memory bookingId) onlyRegisteredAirlines public{
     requestLog memory req = requestLogs[requests];
     req.requestedBy = requestedBy;
     req.requestedTo = requestedTo;
@@ -49,7 +68,7 @@ contract Migrations {
     requests = requests+1;
   }  
 
-  function registerResponse(address responseBy,address responseTo,string memory bookingId,string memory requestStatus) public{
+  function registerResponse(address responseBy,address responseTo,string memory bookingId,string memory requestStatus) onlyRegisteredAirlines public{
     responseLog memory res = responseLogs[responses];
     res.responseBy = responseBy;
     res.responseTo = responseTo;

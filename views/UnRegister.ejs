@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>User Login</title>
+	<title>Deregister Airline</title>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 	
 </head>
@@ -11,7 +11,7 @@
     <a class="nav-link" href="/">Home</a>
   </li>
   <li class="nav-item" >
-    <a class="nav-link active" href="#">User Login</a>
+    <a class="nav-link" href="/userlogin">User Login</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/userRegistration">User Registration</a>
@@ -23,24 +23,27 @@
     <a class="nav-link" href="/Register">Register Airlines</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="/UnRegister">Un-Register Airlines</a>
+    <a class="nav-link active" href="/UnRegister">Un-Register Airlines</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/UnRegisterUser">Un-Register User</a>
   </li>
 </ul>
-<form action="/userlogin" method="POST" style = "margin-top: 70px;width: 50%;margin-left: 300px;">
+<form action="/UnRegisterAirline" method="POST" style = "margin-top: 70px;width: 50%;margin-left: 300px;">
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="inputEmail" style="font-weight: bold;color: black">Email</label>
-      <input type="email" class="form-control" id="logininputEmail" name="logininputEmail" placeholder="User Email" required>
+      <input type="email" class="form-control" id="logininputEmail" name="logininputEmail" placeholder="Airline Id" required>
     </div>
     <div class="form-group col-md-6">
       <label for="inputPassword4" style="font-weight: bold;color: black">Password</label>
-      <input type="password" class="form-control" id="inputPassword" name="logininputPassword" placeholder="User's Password" required>
+      <input type="password" class="form-control" id="inputPassword" name="logininputPassword" placeholder="Airline Password" required>
     </div>
+    <label class="form-check-label" for="invalidCheck2" style="color: red">
+        * Airline will be un-registered from the consortium.
+      </label>
   </div>
-  <button type="submit" class="btn btn-primary" id="userBtn" style="margin-left:250px">Login</button>
+  <button type="submit" class="btn btn-info" id="userBtn" style="margin-left:220px;margin-top:20px">Un-Register Airline</button>
 </form>
 </body>	
 </html>
